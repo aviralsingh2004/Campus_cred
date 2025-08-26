@@ -188,12 +188,12 @@ const getRedemptions = async (req, res, next) => {
   }
 };
 
-const getDashboardData = async (req, res, next) => {
+const getHomeData = async (req, res, next) => {
   try {
     const userId = req.user.id;
 
     if (req.user.role !== 'student') {
-      return res.status(403).json({ error: 'Only students can access dashboard' });
+      return res.status(403).json({ error: 'Only students can access Home' });
     }
 
     // Get user points and recent transactions
@@ -217,7 +217,7 @@ const getDashboardData = async (req, res, next) => {
       },
       recentTransactions,
       recentRedemptions,
-      availableRewards: availableRewards.slice(0, 6), // Limit to 6 for dashboard
+      availableRewards: availableRewards.slice(0, 6), // Limit to 6 for Home
       popularRewards
     });
   } catch (error) {
@@ -230,5 +230,5 @@ module.exports = {
   getTransactionHistory,
   redeemPoints,
   getRedemptions,
-  getDashboardData
+  getHomeData
 };

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
@@ -8,6 +8,7 @@ import { CreditCardIcon, AlertCircleIcon } from 'lucide-react';
 
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { login } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -34,7 +35,9 @@ const Login = () => {
     try {
       const result = await login(formData.email, formData.password);
       if (result.success) {
-        navigate('/dashboard');
+        // Redirect to the page they were trying to access, or to appropriate dashboard
+        const from = location.state?.from?.pathname || '/Home';
+        navigate(from, { replace: true });
       } else {
         setError(result.message);
       }
@@ -55,7 +58,7 @@ const Login = () => {
           </div>
         </div>
         <h2 className="mt-4 text-center text-3xl font-bold text-gray-900">
-          Campus Cred
+          CampusCred
         </h2>
         <p className="mt-2 text-center text-sm text-gray-600">
           Sign in to your account
@@ -113,7 +116,7 @@ const Login = () => {
                 <div className="w-full border-t border-gray-300" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">New to Campus Cred?</span>
+                <span className="px-2 bg-white text-gray-500">New to CampusCred?</span>
               </div>
             </div>
 

@@ -55,7 +55,7 @@ const Register = () => {
       const result = await register(registerData);
       
       if (result.success) {
-        navigate('/dashboard');
+        navigate('/Home');
       } else {
         setError(result.message);
       }
@@ -76,7 +76,7 @@ const Register = () => {
           </div>
         </div>
         <h2 className="mt-4 text-center text-3xl font-bold text-gray-900">
-          Join Campus Cred
+          Join CampusCred
         </h2>
         <p className="mt-2 text-center text-sm text-gray-600">
           Create your student account

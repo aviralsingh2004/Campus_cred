@@ -1,5 +1,5 @@
 @echo off
-echo Setting up Campus Cred project...
+echo Setting up CampusCred project...
 echo.
 
 echo Step 1: Install PostgreSQL if not already installed

@@ -81,7 +81,7 @@ const seedDatabase = async () => {
     const rewards = [
       {
         name: 'Coffee Shop Gift Card ($10)',
-        description: 'Enjoy a free coffee and pastry at the campus coffee shop',
+        description: 'Enjoy a free coffee and pastry at the Campuscoffee shop',
         points_cost: 500,
         category: 'Food & Beverage',
         stock: 20
@@ -94,15 +94,15 @@ const seedDatabase = async () => {
         stock: -1 // unlimited
       },
       {
-        name: 'Campus Bookstore 15% Discount',
+        name: 'CampusBookstore 15% Discount',
         description: '15% discount on your next bookstore purchase',
         points_cost: 750,
         category: 'Academic',
         stock: 50
       },
       {
-        name: 'Free Campus Gym Day Pass',
-        description: 'One-day access to the campus fitness center',
+        name: 'Free CampusGym Day Pass',
+        description: 'One-day access to the Campusfitness center',
         points_cost: 200,
         category: 'Recreation',
         stock: 100
@@ -115,7 +115,7 @@ const seedDatabase = async () => {
         stock: 10
       },
       {
-        name: 'Campus Store T-Shirt',
+        name: 'CampusStore T-Shirt',
         description: 'Official university branded t-shirt',
         points_cost: 400,
         category: 'Merchandise',
@@ -130,7 +130,7 @@ const seedDatabase = async () => {
       },
       {
         name: 'Parking Pass (1 Week)',
-        description: 'One week of free parking in premium campus lots',
+        description: 'One week of free parking in premium Campuslots',
         points_cost: 600,
         category: 'Services',
         stock: 15
@@ -164,12 +164,12 @@ const seedDatabase = async () => {
     const transactionReasons = [
       'Attended Career Fair',
       'Completed Student Survey',
-      'Volunteered at Campus Event',
+      'Volunteered at CampusEvent',
       'Perfect Attendance - Week 1',
       'Participated in Study Group',
       'Completed Online Course Module',
       'Attended Workshop: Resume Writing',
-      'Participated in Campus Cleanup',
+      'Participated in CampusCleanup',
       'Submitted Assignment Early',
       'Helped New Student Orientation',
       'Academic Excellence Bonus',

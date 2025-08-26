@@ -27,10 +27,10 @@ const Layout = ({ children }) => {
 
   const navigation = [
     {
-      name: 'Dashboard',
-      href: isAdmin ? '/admin' : '/dashboard',
+      name: 'Home',
+      href: isAdmin ? '/admin' : '/Home',
       icon: HomeIcon,
-      current: location.pathname === (isAdmin ? '/admin' : '/dashboard')
+      current: location.pathname === (isAdmin ? '/admin' : '/Home')
     },
     ...(isAdmin
       ? [
@@ -115,7 +115,7 @@ const Layout = ({ children }) => {
                 <MenuIcon className="h-6 w-6" />
               </button>
               <h1 className="text-xl font-semibold text-gray-900 ml-2">
-                Campus Cred
+                CampusCred
               </h1>
             </div>
             
@@ -160,7 +160,7 @@ const SidebarContent = ({ navigation, user, avatarColor, onLogout, onCloseSideba
             <CreditCardIcon className="h-6 w-6 text-white" />
           </div>
           <div className="ml-3">
-            <h1 className="text-lg font-bold text-gray-900">Campus Cred</h1>
+            <h1 className="text-lg font-bold text-gray-900">CampusCred</h1>
             <p className="text-xs text-gray-500">Points System</p>
           </div>
         </div>

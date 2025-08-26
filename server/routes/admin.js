@@ -10,14 +10,14 @@ const {
   getAllTransactions,
   getAllRedemptions,
   updateRedemptionStatus,
-  getDashboardStats
+  getHomeStats
 } = require('../controllers/adminController');
 
 // All routes require authentication and admin role
 router.use(authenticateToken, requireRole(['admin']));
 
-// Dashboard
-router.get('/dashboard', getDashboardStats);
+// Home
+router.get('/Home', getHomeStats);
 
 // Student management
 router.get('/students', getAllStudents);

@@ -57,7 +57,7 @@ app.use(express.urlencoded({ extended: true }));
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'OK',
-    message: 'Campus Cred API is running',
+    message: 'CampusCred API is running',
     timestamp: new Date().toISOString(),
     version: '1.0.0'
   });
@@ -102,10 +102,10 @@ const startServer = async () => {
       console.log('  POST /api/auth/register - Register user');
       console.log('  POST /api/auth/login - Login user');
       console.log('  GET  /api/auth/profile - Get user profile');
-      console.log('  GET  /api/students/dashboard - Student dashboard');
+      console.log('  GET  /api/students/Home - Student Home');
       console.log('  GET  /api/students/:id/points - Get student points');
       console.log('  POST /api/students/:id/redeem - Redeem points');
-      console.log('  GET  /api/admin/dashboard - Admin dashboard');
+      console.log('  GET  /api/admin/Home - Admin Home');
       console.log('  POST /api/admin/students/:id/add-points - Add points');
       console.log('  POST /api/admin/students/:id/deduct-points - Deduct points');
       console.log('  GET  /api/rewards - Get all rewards');

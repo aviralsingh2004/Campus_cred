@@ -76,7 +76,7 @@ export const useStudents = (page = 1, search = '') => {
   return useApi(url, { dependencies: [page, search] });
 };
 
-export const useDashboard = (role) => {
-  const url = role === 'admin' ? '/admin/dashboard' : '/students/dashboard';
+export const useHome = (role) => {
+  const url = role === 'admin' ? '/admin/Home' : '/students/Home';
   return useApi(url, { dependencies: [role] });
 };

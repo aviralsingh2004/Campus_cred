@@ -270,9 +270,9 @@ const updateRedemptionStatus = async (req, res, next) => {
   }
 };
 
-const getDashboardStats = async (req, res, next) => {
+const getHomeStats = async (req, res, next) => {
   try {
-    // Get various statistics for admin dashboard
+    // Get various statistics for admin Home
     const [transactionStats, redemptionStats] = await Promise.all([
       Transaction.getTransactionStats(),
       Redemption.getRedemptionStats()
@@ -306,5 +306,5 @@ module.exports = {
   getAllTransactions,
   getAllRedemptions,
   updateRedemptionStatus,
-  getDashboardStats
+  getHomeStats
 };

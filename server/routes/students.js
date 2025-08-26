@@ -7,14 +7,14 @@ const {
   getTransactionHistory,
   redeemPoints,
   getRedemptions,
-  getDashboardData
+  getHomeData
 } = require('../controllers/studentController');
 
 // All routes require authentication
 router.use(authenticateToken);
 
-// Student dashboard
-router.get('/dashboard', getDashboardData);
+// Student Home
+router.get('/Home', getHomeData);
 
 // Points and transactions
 router.get('/:id/points', getPoints);
