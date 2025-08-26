@@ -14,7 +14,7 @@ const addPoints = async (req, res, next) => {
 
     await client.query('BEGIN');
 
-    // Get user
+    // Get student user
     const user = await User.findById(userId);
     if (!user) {
       await client.query('ROLLBACK');
@@ -26,12 +26,33 @@ const addPoints = async (req, res, next) => {
       return res.status(400).json({ error: 'Can only add points to student accounts' });
     }
 
-    // Update points balance
-    const newBalance = user.points_balance + amount;
-    await User.updatePointsBalance(userId, newBalance);
+    // Get admin user to check balance
+    const admin = await User.findById(adminId);
+    if (!admin) {
+      await client.query('ROLLBACK');
+      return res.status(404).json({ error: 'Admin not found' });
+    }
 
-    // Create transaction record
-    const transaction = await Transaction.create({
+    // Check if admin has sufficient balance
+    if (admin.points_balance < amount) {
+      await client.query('ROLLBACK');
+      return res.status(400).json({ 
+        error: 'Insufficient admin balance',
+        adminBalance: admin.points_balance,
+        requiredAmount: amount
+      });
+    }
+
+    // Update student's points balance (credit)
+    const newStudentBalance = user.points_balance + amount;
+    await User.updatePointsBalance(userId, newStudentBalance);
+
+    // Update admin's points balance (debit)
+    const newAdminBalance = admin.points_balance - amount;
+    await User.updatePointsBalance(adminId, newAdminBalance);
+
+    // Create transaction record for student (credit)
+    const studentTransaction = await Transaction.create({
       user_id: userId,
       transaction_type: 'credit',
       amount: amount,
@@ -39,23 +60,43 @@ const addPoints = async (req, res, next) => {
       admin_id: adminId
     });
 
+    // Create transaction record for admin (debit)
+    const adminTransaction = await Transaction.create({
+      user_id: adminId,
+      transaction_type: 'debit',
+      amount: amount,
+      reason: `Transfer to ${user.first_name} ${user.last_name} (${user.student_id}): ${reason}`,
+      admin_id: adminId
+    });
+
     await client.query('COMMIT');
 
     res.json({
-      message: 'Points added successfully',
-      transaction: {
-        id: transaction.id,
-        amount: transaction.amount,
-        reason: transaction.reason,
-        created_at: transaction.created_at
+      message: 'Points transferred successfully',
+      studentTransaction: {
+        id: studentTransaction.id,
+        amount: studentTransaction.amount,
+        reason: studentTransaction.reason,
+        created_at: studentTransaction.created_at
       },
-      user: {
+      adminTransaction: {
+        id: adminTransaction.id,
+        amount: adminTransaction.amount,
+        reason: adminTransaction.reason,
+        created_at: adminTransaction.created_at
+      },
+      student: {
         id: user.id,
         first_name: user.first_name,
         last_name: user.last_name,
         student_id: user.student_id,
         previous_balance: user.points_balance,
-        new_balance: newBalance
+        new_balance: newStudentBalance
+      },
+      admin: {
+        id: admin.id,
+        previous_balance: admin.points_balance,
+        new_balance: newAdminBalance
       }
     });
 

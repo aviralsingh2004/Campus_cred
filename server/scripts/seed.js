@@ -14,12 +14,12 @@ const seedDatabase = async () => {
     // Create admin user
     const adminPassword = await bcrypt.hash('admin123', 12);
     const adminResult = await client.query(
-      `INSERT INTO users (email, password, first_name, last_name, role) 
-       VALUES ($1, $2, $3, $4, $5) RETURNING id`,
-      ['admin@campuscred.edu', adminPassword, 'Admin', 'User', 'admin']
+      `INSERT INTO users (email, password, first_name, last_name, role, points_balance) 
+       VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
+      ['admin@campuscred.edu', adminPassword, 'Admin', 'User', 'admin', 50000]
     );
     const adminId = adminResult.rows[0].id;
-    console.log('👑 Created admin user: admin@campuscred.edu / admin123');
+    console.log('👑 Created admin user: admin@campuscred.edu / admin123 (Balance: 50,000 points)');
 
     // Create sample student users
     const students = [

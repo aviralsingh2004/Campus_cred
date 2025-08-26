@@ -6,6 +6,7 @@ import Login from './pages/Login'
 import Register from './pages/Register'
 import Home from './pages/Home'
 import AdminHome from './pages/AdminHome'
+import AdminStudents from './pages/AdminStudents'
 import Points from './pages/Points'
 import Rewards from './pages/Rewards'
 import AdminCredit from './pages/AdminCredit'
@@ -51,7 +52,7 @@ function App() {
             } />
             <Route path="/admin/students" element={
               <ProtectedRoute requireAuth={true} allowedRoles={['admin']}>
-                <Layout><div className="p-6"><h1 className="text-2xl font-bold text-gray-900">Manage Students</h1><p className="mt-2 text-gray-600">Student management features coming soon!</p></div></Layout>
+                <Layout><AdminStudents /></Layout>
               </ProtectedRoute>
             } />
             <Route path="/admin/transactions" element={
