@@ -64,6 +64,17 @@ const validatePointsUpdate = [
   handleValidationErrors
 ];
 
+// Accept either { points, reason } or { amount, reason } and normalize to { amount, reason }
+const normalizePointsAmount = (req, _res, next) => {
+  if (req.body && req.body.points != null && req.body.amount == null) {
+    const parsed = parseInt(req.body.points);
+    if (!Number.isNaN(parsed)) {
+      req.body.amount = parsed;
+    }
+  }
+  next();
+};
+
 const validateRedemption = [
   param('id')
     .isInt({ min: 1 })
@@ -79,5 +90,6 @@ module.exports = {
   validateRegister,
   validateLogin,
   validatePointsUpdate,
-  validateRedemption
+  validateRedemption,
+  normalizePointsAmount
 };

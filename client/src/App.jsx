@@ -7,6 +7,7 @@ import Register from './pages/Register'
 import Home from './pages/Home'
 import Points from './pages/Points'
 import Rewards from './pages/Rewards'
+import AdminCredit from './pages/AdminCredit'
 import './App.css'
 
 function App() {
@@ -36,10 +37,15 @@ function App() {
               </ProtectedRoute>
             } />
             
-            {/* Admin Routes - Placeholder for future implementation */}
+            {/* Admin Routes */}
             <Route path="/admin" element={
               <ProtectedRoute requireAuth={true} allowedRoles={['admin']}>
                 <Layout><div className="p-6"><h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1><p className="mt-2 text-gray-600">Admin features coming soon!</p></div></Layout>
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/credit" element={
+              <ProtectedRoute requireAuth={true} allowedRoles={['admin']}>
+                <Layout><AdminCredit /></Layout>
               </ProtectedRoute>
             } />
             <Route path="/admin/students" element={

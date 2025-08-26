@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { authenticateToken, requireRole } = require('../middleware/auth');
-const { validatePointsUpdate } = require('../middleware/validation');
+const { validatePointsUpdate, normalizePointsAmount } = require('../middleware/validation');
 const {
   addPoints,
   deductPoints,
@@ -23,9 +23,9 @@ router.get('/Home', getHomeStats);
 router.get('/students', getAllStudents);
 router.get('/students/:id', getStudentDetails);
 
-// Points management
-router.post('/students/:id/add-points', validatePointsUpdate, addPoints);
-router.post('/students/:id/deduct-points', validatePointsUpdate, deductPoints);
+// Points management (normalize payload then validate)
+router.post('/students/:id/add-points', normalizePointsAmount, validatePointsUpdate, addPoints);
+router.post('/students/:id/deduct-points', normalizePointsAmount, validatePointsUpdate, deductPoints);
 
 // Transaction management
 router.get('/transactions', getAllTransactions);
