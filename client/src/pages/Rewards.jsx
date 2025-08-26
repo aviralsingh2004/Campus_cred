@@ -17,11 +17,11 @@ import { useAuth } from '../context/AuthContext';
 
 const Rewards = () => {
   const { user } = useAuth();
-  const { userPoints, redeemPoints } = usePoints();
+  const { userPoints, redeemPoints, redemptions, refreshData: refreshPoints, loading: pointsLoading } = usePoints();
   const { 
     rewards, 
     categories, 
-    loading, 
+    loading: rewardsLoading, 
     error, 
     filters, 
     updateFilters, 
@@ -106,11 +106,11 @@ const Rewards = () => {
         </div>
         <div className="flex items-center gap-4">
           <button
-            onClick={refreshData}
-            disabled={loading}
+            onClick={() => { refreshData(); refreshPoints(); }}
+            disabled={rewardsLoading || pointsLoading}
             className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 transition-colors"
           >
-            <RefreshCwIcon className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCwIcon className={`h-4 w-4 ${(rewardsLoading || pointsLoading) ? 'animate-spin' : ''}`} />
             Refresh
           </button>
           <div className="flex items-center gap-2">
@@ -176,7 +176,7 @@ const Rewards = () => {
 
       {/* Rewards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {loading ? (
+        {rewardsLoading ? (
           <div className="col-span-full text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
             <p className="text-gray-500 mt-4">Loading rewards...</p>
@@ -240,7 +240,7 @@ const Rewards = () => {
         </div>
         <div className="p-6">
           <div className="space-y-4">
-            {loading ? (
+            {pointsLoading ? (
               <div className="text-center py-8">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto"></div>
                 <p className="text-sm text-gray-500 mt-2">Loading redemption history...</p>

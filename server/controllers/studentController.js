@@ -132,12 +132,15 @@ const redeemPoints = async (req, res, next) => {
       reward_id: reward_id
     });
 
-    // Create redemption record
-    const redemption = await Redemption.create({
+    // Create redemption record (start as pending, then mark completed)
+    let redemption = await Redemption.create({
       user_id: userId,
       reward_id: reward_id,
       points_spent: reward.points_cost
     });
+
+    // Mark redemption as completed now that all operations succeeded
+    redemption = await Redemption.updateStatus(redemption.id, 'completed');
 
     await client.query('COMMIT');
 

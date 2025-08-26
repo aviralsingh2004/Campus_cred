@@ -7,16 +7,28 @@ import {
   ClockIcon,
   UserIcon,
   TrendingUpIcon,
-  FilterIcon
+  FilterIcon,
+  PlusIcon,
+  XIcon
 } from 'lucide-react';
 import { cn } from '../utils/helpers';
+import { useAuth } from '../context/AuthContext';
 
 const Home = () => {
+  const { user } = useAuth();
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [sortBy, setSortBy] = useState('latest');
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [newPost, setNewPost] = useState({
+    title: '',
+    content: '',
+    category: 'academic',
+    tags: ''
+  });
 
   // Sample posts data
-  const posts = [
+  const [posts, setPosts] = useState([
     {
       id: 1,
       title: "How I Earned 500 Points in My First Semester",
@@ -137,7 +149,7 @@ const Home = () => {
       publishedAt: "2024-01-10T13:20:00Z",
       featured: false
     }
-  ];
+  ]);
 
   const categories = [
     { id: 'all', name: 'All Posts', count: posts.length },
@@ -181,8 +193,19 @@ const Home = () => {
     <div className="max-w-7xl mx-auto">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Campus Community</h1>
-        <p className="text-gray-600">Discover insights, tips, and stories from your peers</p>
+        <div className="flex items-start justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Campus Community</h1>
+            <p className="text-gray-600">Discover insights, tips, and stories from your peers</p>
+          </div>
+          <button
+            onClick={() => setShowCreateModal(true)}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors"
+          >
+            <PlusIcon className="h-4 w-4" />
+            Add Post
+          </button>
+        </div>
       </div>
 
       {/* Filters and Sort */}
@@ -245,6 +268,124 @@ const Home = () => {
       {sortedPosts.length === 0 && (
         <div className="text-center py-12">
           <p className="text-gray-500">No posts found in this category.</p>
+        </div>
+      )}
+
+      {/* Create Post Modal */}
+      {showCreateModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/40" onClick={() => !creating && setShowCreateModal(false)} />
+          <div className="relative bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900">Create a new post</h3>
+              <button
+                className="p-1 rounded-md text-gray-500 hover:bg-gray-100"
+                onClick={() => !creating && setShowCreateModal(false)}
+              >
+                <XIcon className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="px-6 py-5 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                <input
+                  type="text"
+                  value={newPost.title}
+                  onChange={(e) => setNewPost(p => ({ ...p, title: e.target.value }))}
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  placeholder="What's on your mind?"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Content</label>
+                <textarea
+                  rows={5}
+                  value={newPost.content}
+                  onChange={(e) => setNewPost(p => ({ ...p, content: e.target.value }))}
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  placeholder="Share your experience, tips, or story..."
+                />
+                <p className="text-xs text-gray-500 mt-1">An excerpt will be generated from the first 160 characters.</p>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                  <select
+                    value={newPost.category}
+                    onChange={(e) => setNewPost(p => ({ ...p, category: e.target.value }))}
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  >
+                    <option value="academic">Academic</option>
+                    <option value="events">Events</option>
+                    <option value="community">Community</option>
+                    <option value="journey">Journey</option>
+                    <option value="benefits">Benefits</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Tags</label>
+                  <input
+                    type="text"
+                    value={newPost.tags}
+                    onChange={(e) => setNewPost(p => ({ ...p, tags: e.target.value }))}
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    placeholder="e.g. tips, study, first-year"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Comma-separated, like: study, tips, motivation</p>
+                </div>
+              </div>
+            </div>
+            <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-end gap-3">
+              <button
+                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                onClick={() => !creating && setShowCreateModal(false)}
+                disabled={creating}
+              >
+                Cancel
+              </button>
+              <button
+                className={cn(
+                  'px-4 py-2 rounded-md text-white',
+                  creating ? 'bg-primary-400' : 'bg-primary-600 hover:bg-primary-700'
+                )}
+                onClick={async () => {
+                  if (!newPost.title.trim() || !newPost.content.trim()) return;
+                  setCreating(true);
+                  // Simulate fast create (could be replaced with API later)
+                  const created = {
+                    id: Date.now(),
+                    title: newPost.title.trim(),
+                    excerpt: newPost.content.trim().slice(0, 160),
+                    content: newPost.content.trim(),
+                    author: {
+                      name: `${user?.first_name || 'You'} ${user?.last_name || ''}`.trim() || 'Anonymous',
+                      avatar: (user?.first_name?.[0] || 'Y').toUpperCase() + (user?.last_name?.[0] || '').toUpperCase(),
+                      role: user?.student_id ? 'Student' : (user?.role || 'Member'),
+                      year: ''
+                    },
+                    category: newPost.category,
+                    tags: newPost.tags
+                      .split(',')
+                      .map(t => t.trim())
+                      .filter(Boolean),
+                    likes: 0,
+                    comments: 0,
+                    shares: 0,
+                    readTime: `${Math.max(1, Math.ceil(newPost.content.trim().split(/\s+/).length / 200))} min read`,
+                    publishedAt: new Date().toISOString(),
+                    featured: false
+                  };
+                  setPosts(prev => [created, ...prev]);
+                  setCreating(false);
+                  setShowCreateModal(false);
+                  setNewPost({ title: '', content: '', category: 'academic', tags: '' });
+                }}
+                disabled={creating}
+              >
+                {creating ? 'Posting...' : 'Post'}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

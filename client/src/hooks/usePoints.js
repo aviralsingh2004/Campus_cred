@@ -132,8 +132,9 @@ export const usePoints = () => {
         currentUpdateUser({ points_balance: new_balance });
       }
 
-      // Refresh points data
+      // Refresh points and redemption data
       await fetchPointsData();
+      await fetchRedemptions();
 
       return {
         success: true,
