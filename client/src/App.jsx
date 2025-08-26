@@ -5,6 +5,7 @@ import ProtectedRoute from './components/ProtectedRoute'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import Home from './pages/Home'
+import AdminHome from './pages/AdminHome'
 import Points from './pages/Points'
 import Rewards from './pages/Rewards'
 import AdminCredit from './pages/AdminCredit'
@@ -40,7 +41,7 @@ function App() {
             {/* Admin Routes */}
             <Route path="/admin" element={
               <ProtectedRoute requireAuth={true} allowedRoles={['admin']}>
-                <Layout><div className="p-6"><h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1><p className="mt-2 text-gray-600">Admin features coming soon!</p></div></Layout>
+                <Layout><AdminHome /></Layout>
               </ProtectedRoute>
             } />
             <Route path="/admin/credit" element={
@@ -56,11 +57,6 @@ function App() {
             <Route path="/admin/transactions" element={
               <ProtectedRoute requireAuth={true} allowedRoles={['admin']}>
                 <Layout><div className="p-6"><h1 className="text-2xl font-bold text-gray-900">Transaction History</h1><p className="mt-2 text-gray-600">Transaction management features coming soon!</p></div></Layout>
-              </ProtectedRoute>
-            } />
-            <Route path="/admin/rewards" element={
-              <ProtectedRoute requireAuth={true} allowedRoles={['admin']}>
-                <Layout><div className="p-6"><h1 className="text-2xl font-bold text-gray-900">Manage Rewards</h1><p className="mt-2 text-gray-600">Reward management features coming soon!</p></div></Layout>
               </ProtectedRoute>
             } />
           </Routes>

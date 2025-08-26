@@ -45,12 +45,6 @@ const Layout = ({ children }) => {
             href: '/admin/transactions',
             icon: BarChart3Icon,
             current: location.pathname === '/admin/transactions'
-          },
-          {
-            name: 'Rewards',
-            href: '/admin/rewards',
-            icon: GiftIcon,
-            current: location.pathname.startsWith('/admin/rewards')
           }
         ]
       : [
