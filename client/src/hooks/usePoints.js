@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { pointsAPI, handleAPIError } from '../utils/apiServices';
 
@@ -19,14 +19,28 @@ export const usePoints = () => {
     monthlySpent: 0
   });
 
-  // Fetch user points and transaction data
+  // Use refs to prevent dependency issues and avoid infinite loops
+  const userRef = useRef(user);
+  const updateUserRef = useRef(updateUser);
+  const hasLoadedOnce = useRef(false);
+  
+  // Update refs when values change
+  useEffect(() => {
+    userRef.current = user;
+    updateUserRef.current = updateUser;
+  }, [user, updateUser]);
+
+  // Fetch user points and transaction data - stable function with no dependencies
   const fetchPointsData = useCallback(async () => {
-    if (!user?.id) return;
+    const currentUser = userRef.current;
+    const currentUpdateUser = updateUserRef.current;
+    
+    if (!currentUser?.id) return;
 
     setPointsData(prev => ({ ...prev, loading: true, error: null }));
 
     try {
-      const response = await pointsAPI.getUserPoints(user.id);
+      const response = await pointsAPI.getUserPoints(currentUser.id);
       const { user: userData, transactions } = response.data;
 
       // Calculate stats
@@ -72,7 +86,9 @@ export const usePoints = () => {
       });
 
       // Update user points in auth context
-      updateUser({ points_balance: userData.points_balance });
+      if (currentUpdateUser) {
+        currentUpdateUser({ points_balance: userData.points_balance });
+      }
 
     } catch (error) {
       const errorData = handleAPIError(error);
@@ -82,14 +98,15 @@ export const usePoints = () => {
         error: errorData.message
       }));
     }
-  }, [user?.id, updateUser]);
+  }, []); // Empty dependency array - function uses refs
 
-  // Fetch redemptions
+  // Fetch redemptions - stable function with no dependencies
   const fetchRedemptions = useCallback(async () => {
-    if (!user?.id) return;
+    const currentUser = userRef.current;
+    if (!currentUser?.id) return;
 
     try {
-      const response = await pointsAPI.getUserRedemptions(user.id, 1, 10);
+      const response = await pointsAPI.getUserRedemptions(currentUser.id, 1, 10);
       setPointsData(prev => ({
         ...prev,
         redemptions: response.data.redemptions
@@ -97,18 +114,23 @@ export const usePoints = () => {
     } catch (error) {
       console.error('Failed to fetch redemptions:', error);
     }
-  }, [user?.id]);
+  }, []); // Empty dependency array - function uses refs
 
   // Redeem points for a reward
   const redeemPoints = useCallback(async (rewardId) => {
-    if (!user?.id) return { success: false, message: 'User not authenticated' };
+    const currentUser = userRef.current;
+    const currentUpdateUser = updateUserRef.current;
+    
+    if (!currentUser?.id) return { success: false, message: 'User not authenticated' };
 
     try {
-      const response = await pointsAPI.redeemPoints(user.id, rewardId);
+      const response = await pointsAPI.redeemPoints(currentUser.id, rewardId);
       const { new_balance, redemption } = response.data;
 
       // Update user points balance
-      updateUser({ points_balance: new_balance });
+      if (currentUpdateUser) {
+        currentUpdateUser({ points_balance: new_balance });
+      }
 
       // Refresh points data
       await fetchPointsData();
@@ -126,18 +148,28 @@ export const usePoints = () => {
         message: errorData.message
       };
     }
-  }, [user?.id, updateUser, fetchPointsData]);
+  }, [fetchPointsData]);
 
-  // Load data on mount and when user changes
+  // Load data only once when user changes - prevents infinite loops
   useEffect(() => {
     if (user?.id) {
-      fetchPointsData();
-      fetchRedemptions();
+      // Reset the flag when user changes
+      hasLoadedOnce.current = false;
+      
+      // Fetch data only if not already loaded for this user
+      if (!hasLoadedOnce.current) {
+        hasLoadedOnce.current = true;
+        console.log('Loading points data for user:', user.id);
+        fetchPointsData();
+        fetchRedemptions();
+      }
     }
-  }, [user?.id, fetchPointsData, fetchRedemptions]);
+  }, [user?.id]); // Only depend on user.id
 
-  // Refresh data
+  // Refresh data function - for manual refresh only
   const refreshData = useCallback(() => {
+    console.log('Manual refresh triggered');
+    hasLoadedOnce.current = false; // Allow fresh reload
     fetchPointsData();
     fetchRedemptions();
   }, [fetchPointsData, fetchRedemptions]);

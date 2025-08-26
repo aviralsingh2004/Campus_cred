@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { rewardsAPI, handleAPIError } from '../utils/apiServices';
 
 export const useRewards = () => {
@@ -12,32 +12,76 @@ export const useRewards = () => {
     sortBy: 'name'
   });
 
-  // Fetch all rewards
+  // Prevent excessive API calls
+  const lastFetchTime = useRef(0);
+  const isMounted = useRef(true);
+  const FETCH_COOLDOWN = 3000; // 3 seconds cooldown
+
+  useEffect(() => {
+    isMounted.current = true;
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
+
+  // Fetch all rewards with cooldown
   const fetchRewards = useCallback(async () => {
+    const now = Date.now();
+    if (now - lastFetchTime.current < FETCH_COOLDOWN) {
+      console.log('Rewards fetch skipped due to cooldown');
+      return;
+    }
+
+    if (loading) return; // Prevent concurrent requests
+
+    lastFetchTime.current = now;
     setLoading(true);
     setError(null);
 
     try {
       const response = await rewardsAPI.getAllRewards();
-      setRewards(response.data.rewards || response.data);
+      
+      if (isMounted.current) {
+        setRewards(response.data.rewards || response.data);
+      }
     } catch (error) {
-      const errorData = handleAPIError(error);
-      setError(errorData.message);
+      if (isMounted.current) {
+        const errorData = handleAPIError(error);
+        setError(errorData.message);
+      }
     } finally {
-      setLoading(false);
+      if (isMounted.current) {
+        setLoading(false);
+      }
     }
-  }, []);
+  }, [loading]);
 
   // Fetch reward categories
   const fetchCategories = useCallback(async () => {
     try {
-      const response = await rewardsAPI.getRewardCategories();
-      setCategories(response.data.categories || response.data);
+      // Extract categories from rewards instead of making separate API call
+      if (rewards.length > 0) {
+        const uniqueCategories = [...new Set(rewards.map(reward => reward.category))];
+        if (isMounted.current) {
+          setCategories(uniqueCategories);
+        }
+      }
     } catch (error) {
-      console.error('Failed to fetch categories:', error);
+      console.error('Failed to extract categories:', error);
     }
-  }, []);
+  }, [rewards]);
 
+  // Load initial data only once
+  useEffect(() => {
+    fetchRewards();
+  }, []); // Empty dependency array
+
+  // Update categories when rewards change
+  useEffect(() => {
+    if (rewards.length > 0) {
+      fetchCategories();
+    }
+  }, [rewards, fetchCategories]);
   // Get filtered and sorted rewards
   const getFilteredRewards = useCallback(() => {
     let filtered = [...rewards];
@@ -93,13 +137,7 @@ export const useRewards = () => {
     }
   }, []);
 
-  // Load data on mount
-  useEffect(() => {
-    fetchRewards();
-    fetchCategories();
-  }, [fetchRewards, fetchCategories]);
-
-  // Refresh data
+  // Refresh data with cooldown
   const refreshData = useCallback(() => {
     fetchRewards();
   }, [fetchRewards]);

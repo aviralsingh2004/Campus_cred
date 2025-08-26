@@ -26,23 +26,33 @@ app.use(cors({
   credentials: true
 }));
 
-// Rate limiting
+// Rate limiting - More lenient for development
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
+  max: 500, // Increased limit for development
   message: {
     error: 'Too many requests from this IP, please try again later.'
   },
   standardHeaders: true,
   legacyHeaders: false,
+  skip: (req) => {
+    // Skip rate limiting in development for localhost
+    return process.env.NODE_ENV === 'development' && 
+           (req.ip === '127.0.0.1' || req.ip === '::1' || req.ip.includes('192.168.') || req.ip.includes('10.'));
+  }
 });
 
 // Apply rate limiting to auth routes more strictly
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 20, // limit each IP to 20 requests per windowMs for auth
+  max: 50, // Increased for development
   message: {
     error: 'Too many authentication attempts, please try again later.'
+  },
+  skip: (req) => {
+    // Skip rate limiting in development for localhost
+    return process.env.NODE_ENV === 'development' && 
+           (req.ip === '127.0.0.1' || req.ip === '::1' || req.ip.includes('192.168.') || req.ip.includes('10.'));
   }
 });
 

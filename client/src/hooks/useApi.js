@@ -49,7 +49,7 @@ export const useApi = (url, options = {}) => {
   return { data, loading, error, execute, refetch: () => execute() };
 };
 
-export const usePoints = (userId) => {
+export const usePointsApi = (userId) => {
   return useApi(`/students/${userId}/points`, {
     dependencies: [userId],
     immediate: !!userId
