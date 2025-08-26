@@ -24,8 +24,9 @@ const ProtectedRoute = ({ children, requireAuth = true, allowedRoles = [] }) => 
 
   // If specific roles are required, check if user has the required role
   if (allowedRoles.length > 0 && (!user || !allowedRoles.includes(user.role))) {
-    // Redirect to home page if user doesn't have required role
-    return <Navigate to="/Home" replace />;
+    // Redirect based on user's actual role
+    const redirectPath = user?.role === 'admin' ? '/admin' : '/Home';
+    return <Navigate to={redirectPath} replace />;
   }
 
   // If user is authenticated and has required role (or no role requirement), render children

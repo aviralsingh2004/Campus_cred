@@ -35,9 +35,22 @@ const Login = () => {
     try {
       const result = await login(formData.email, formData.password);
       if (result.success) {
-        // Redirect to the page they were trying to access, or to appropriate dashboard
-        const from = location.state?.from?.pathname || '/Home';
-        navigate(from, { replace: true });
+        // Get the user data from localStorage (updated by the login function)
+        const userData = JSON.parse(localStorage.getItem('campus_cred_user'));
+        
+        // Redirect based on user role
+        let redirectPath = '/Home'; // default for students
+        if (userData?.role === 'admin') {
+          redirectPath = '/admin';
+        }
+        
+        // If they were trying to access a specific page, redirect there (if they have permission)
+        const from = location.state?.from?.pathname;
+        if (from && from !== '/login') {
+          redirectPath = from;
+        }
+        
+        navigate(redirectPath, { replace: true });
       } else {
         setError(result.message);
       }
